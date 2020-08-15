@@ -16,6 +16,13 @@ class TodoTableViewController: UITableViewController {
         super.viewDidLoad()
 
         title = "Todos"
+        if let loadedTodos = Todo.loadFromFile() {
+            //Found file, load todos
+            todos = loadedTodos
+        } else {
+            //cant find file, load sample todos
+            todos = Todo.loadSampleData()
+        }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -69,6 +76,7 @@ class TodoTableViewController: UITableViewController {
         if editingStyle == .delete {
             // Delete the row from the data source
             todos.remove(at: indexPath.row)
+            Todo.saveToFile(todos: todos)
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -81,6 +89,7 @@ class TodoTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
         let todo = todos.remove(at: fromIndexPath.row)
         todos.insert(todo, at: to.row)
+        Todo.saveToFile(todos: todos)
         tableView.reloadData()
     }
     
@@ -124,6 +133,7 @@ class TodoTableViewController: UITableViewController {
             let source = segue.source as! EditTodoTableViewController
             if source.isNewTodo {
                 todos.append(source.todo)
+                Todo.saveToFile(todos: todos)
                 tableView.reloadData() // this doesn't work... hmph
             }
             
